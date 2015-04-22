@@ -1,4 +1,4 @@
 {% for url in page.stylesheets %}
-    <link rel="stylesheet" type="text/css" href="{% unless jsfile contains '//' %}{{ site.url }}{% endunless %}{{ jsfile }}" />
+    <link rel="stylesheet" type="text/css" href="{% unless url contains '//' %}{{ site.url }}{% endunless %}{{ url }}" />
 {% endfor %}
 <link rel="stylesheet" type="text/css" href="{{ site.url }}/css/app.css" />
