@@ -7,8 +7,17 @@ defaults:
     -
         values:
             layout: default
+    -
+        scope:
+            type: posts
+        values:
+            layout: question
 
 # Jekyll config
+
+permalink: none
+
+gems: [bourbon, neat]
 
 encoding: utf-8
 

@@ -1,0 +1,30 @@
+---
+layout: default
+---
+
+<h1>
+    <div class="prev-button">
+        {% if page.previous %}
+            <a href="{{ page.previous }}">
+        {% else %}
+            <a href="javascript:void(0)" class="disabled">
+        {% endif %}
+        &lt;&lt;</a>
+    </div>
+    <div class="next-button">
+        {% if page.next %}
+            <a href="{{ page.next }}">
+        {% else %}
+            <a href="javascript:void(0)" class="disabled">
+        {% endif %}
+        &gt;&gt;</a>
+    </div>
+    {{ page.title }}
+</h1>
+
+<form id="question-form">
+    {{ content }}
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
