@@ -2,7 +2,7 @@
 import api
 import uuid
 
-import mysql.connector
+import pymysql
 
 mysql_config = {
 }
@@ -15,7 +15,7 @@ def get_conn():
             return __conn
         else:
             __conn.close()
-    __conn = connector.connect(**mysql_config)
+    __conn = pymysql.connect(**mysql_config)
     return __conn
 
 def token():
