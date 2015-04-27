@@ -96,10 +96,15 @@ div.pseudo-select {
         border-radius: 0.4em;
         padding: 0.4em 0.8em;
         text-align: center;
+        cursor: pointer;
     }
 
     & > div.selected {
         background-color: $highlight1;
+    }
+
+    & > div:active {
+        background-color: $highlight2;
     }
 }
 
