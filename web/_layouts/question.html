@@ -1,11 +1,15 @@
 ---
 layout: default
+post_scripts:
+    - /js/question.js
+redirects:
+    - not_logged_in
 ---
 
 <h1>
     <div class="prev-button">
         {% if page.previous %}
-            <a href="{{ page.previous }}">
+            <a href="{{ page.previous.url }}">
         {% else %}
             <a href="javascript:void(0)" class="disabled">
         {% endif %}
@@ -13,7 +17,7 @@ layout: default
     </div>
     <div class="next-button">
         {% if page.next %}
-            <a href="{{ page.next }}">
+            <a href="{{ page.next.url }}">
         {% else %}
             <a href="javascript:void(0)" class="disabled">
         {% endif %}
@@ -24,6 +28,7 @@ layout: default
 
 <form id="question-form">
     {{ content }}
+    <input type="hidden" name="question" value="{{ page.question }}" />
     <div>
         <button type="submit">Submit</button>
     </div>
