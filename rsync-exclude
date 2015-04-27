@@ -1,0 +1,4 @@
+.git
+.sass-cache
+__pycache__
+config.py

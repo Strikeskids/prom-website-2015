@@ -1,0 +1,11 @@
+#!/bin/bash
+
+dir="$(dirname "$0")"
+
+cd $dir
+
+echo 'Syncing files'
+rsync -tvrp --exclude-from rsync-exclude . sanguine:/home/api/prom/
+
+echo 'Running devploy'
+ssh sanguine -t "cd /home/api/prom/; exec api/devploy $@"
