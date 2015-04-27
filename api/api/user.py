@@ -37,7 +37,10 @@ def get_user_scores(uid=None):
         args = (uid,)
 
         cursor.execute(query, args)
-        return cursor.fetchone()
+        scores = cursor.fetchone()
+        scores['num'] = scores['num'] or 0
+        scores['score'] = scores['score'] or 0
+        return scores
 
 def login(username, password):
     validate(login_schema, {
