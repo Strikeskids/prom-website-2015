@@ -26,10 +26,9 @@ def status_hook():
 def login():
     flat = api.common.flat_multi(request.form)
     api.user.login(flat['username'], flat['password'])
+    print('Logged in')
 
-    user = api.user.get_user()
-
-    return WebSuccess('Logged in', {next: '/question%d'%(user['question'], )})
+    return WebSuccess('Logged in', {'next': api.question.get_next_question_url()})
 
 @blueprint.route('/logout', methods=['GET'])
 @api_wrapper

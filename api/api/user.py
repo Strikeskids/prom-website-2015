@@ -30,10 +30,7 @@ def get_user_scores(uid=None):
             raise InternalException('Need uid to get scores')
         uid = session['uid']
 
-    try:
-        conn = get_conn()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-
+    with get_conn() as cursor:
         query = ('SELECT SUM(`submissions`.`points`) AS `score`, MAX(`questions`.`num`) AS `num`'
                 ' FROM `submissions` INNER JOIN `questions` ON `submissions`.`qid` = `questions`.`qid`'
                 ' WHERE `uid` = %s;')
@@ -41,9 +38,6 @@ def get_user_scores(uid=None):
 
         cursor.execute(query, args)
         return cursor.fetchone()
-    finally:
-        if cursor: cursor.close()
-
 
 def login(username, password):
     validate(login_schema, {
@@ -70,25 +64,21 @@ def create_user(username, password):
 
     uid = api.common.token()
 
-    cursor = None
-
-    try:
-        conn = get_conn()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-
+    with get_conn() as cursor:
         query = 'INSERT INTO `users` (`uid`, `username`, `password_hash`) VALUES (%s, %s, %s);'
 
-        cursor.execute(query, (uid, username, hash_password(password)))
+        try:
+            cursor.execute(query, (uid, username, hash_password(password)))
+        except pymysql.err.IntegrityError as e:
+            raise WebException('User already exists')
 
         return uid
-    finally:
-        if cursor: cursor.close()
 
 def get_user(uid=None, name=None):
     query = 'SELECT * FROM `users` WHERE '
     wheres = []
     if name:
-        wheres.append(('`name` = %s', name))
+        wheres.append(('`username` = %s', name))
     if uid or 'uid' in session:
         wheres.append(('`uid` = %s', uid or session['uid']))
     if not wheres:
@@ -97,17 +87,10 @@ def get_user(uid=None, name=None):
     clauses, args = zip(*wheres)
     query += ' AND '.join(clauses)
 
-    try:
-        conn = get_conn()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-
+    with get_conn() as cursor:
         cursor.execute(query, tuple(args))
 
-        for result in cursor:
-            return result
-    finally:
-        if cursor:
-            cursor.close()
+        return cursor.fetchone()
 
 def hash_password(password):
     """
@@ -128,4 +111,4 @@ def confirm_password(attempt, password_hash):
         password_hash: the real password pash
     """
 
-    return bcrypt.hashpw(attempt, password_hash) == password_hash
+    return bcrypt.checkpw(attempt, password_hash)

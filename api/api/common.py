@@ -12,11 +12,19 @@ __conn = None
 def get_conn():
     global __conn
     if __conn:
-        if __conn.is_connected():
+        try:
+            __conn.ping()
             return __conn
-        else:
-            __conn.close()
-    __conn = pymysql.connect(**mysql_config)
+        except:
+            pass
+
+    decoders = pymysql.converters.decoders
+
+    for k, v in decoders.items():
+        if v == pymysql.converters.Decimal:
+            decoders[k] = int
+
+    __conn = pymysql.connect(cursorclass=pymysql.cursors.DictCursor, conv=decoders, **mysql_config)
     return __conn
 
 def token():

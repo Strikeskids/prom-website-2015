@@ -13,6 +13,15 @@ cp /home/api/prom/api/prom.conf /etc/nginx/sites-enabled/
 echo "Restarting nginx"
 sudo service nginx start
 
-echo "Starting API"
+echo "Shutting down API"
 tmux kill-session -t promapi 2> /dev/null
-tmux new-session -s promapi -d "cd /home/api/prom/api; python3 run.py"
+
+if [ -z "$1" ] || [ "$1" != "--local" ]; then
+    echo 'Running API in tmux'
+    tmux new-session -s promapi -d "cd /home/api/prom/api ; python3 run.py"
+    exit 0
+fi
+
+echo 'Running API locally'
+cd /home/api/prom/api
+exec ./run.py

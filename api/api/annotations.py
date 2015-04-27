@@ -3,6 +3,7 @@ from functools import wraps
 import json
 import api
 
+from flask import session, request
 from api.common import WebError, WebException, InternalException, SevereInternalException
 
 def error_message(error):

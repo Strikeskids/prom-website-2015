@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from api.app import config_app
 
 def main():
