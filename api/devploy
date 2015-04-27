@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo "Shutting down nginx"
+sudo service nginx stop
+
+echo "Building jekyll"
+cd /home/api/prom/web
+jekyll build --destination /srv/http/prom
+
+echo "Copying config"
+cp prom.conf /etc/nginx/sites-enabled/
+
+echo "Restarting nginx"
+sudo service nginx start
+
+echo "Starting API"
+tmux kill-session -t promapi 2> /dev/null
+tmux new-session -s promapi -d "cd /home/api/prom/api; python3 run.py"
