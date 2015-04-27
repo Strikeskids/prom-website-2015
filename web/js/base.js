@@ -105,7 +105,11 @@ jQuery(function($) {
             if (data.status === 1) {
                 api.userStatus = data.data
                 statusChecks.forEach(function(check) {
-                    if (!!data.data[check.key] === !!check.state) {
+                    if (check.key === 'question') {
+                        if (data.data.question < check.state) {
+                            window.location = check.url
+                        }
+                    } else if (!!data.data[check.key] === !!check.state) {
                         window.location = check.url
                     }
                 })
