@@ -8,7 +8,7 @@ cd /home/api/prom/web
 jekyll build --destination /srv/http/prom
 
 echo "Copying config"
-cp prom.conf /etc/nginx/sites-enabled/
+cp /home/api/prom/api/prom.conf /etc/nginx/sites-enabled/
 
 echo "Restarting nginx"
 sudo service nginx start
