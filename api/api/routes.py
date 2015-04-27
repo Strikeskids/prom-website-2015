@@ -8,7 +8,7 @@ from flask import Blueprint, request, session
 
 blueprint = Blueprint('api', __name__)
 
-@blueprint.route('/status')
+@blueprint.route('/status', methods=['GET'])
 @api_wrapper
 def status_hook():
     logged_in = api.user.is_logged_in()
@@ -21,34 +21,34 @@ def status_hook():
 
     return WebSuccess(data=status)
 
-@blueprint.route('/login')
+@blueprint.route('/login', methods=['POST'])
 @api_wrapper
-@check_csrf
 def login():
-    api.user.login(**api.common.flat_multi(request.form))
+    flat = api.common.flat_multi(request.form)
+    api.user.login(flat['username'], flat['password'])
 
     user = api.user.get_user()
 
-    return WebSuccess('Logged in', {next: '/question%d'%(user['question'])})
+    return WebSuccess('Logged in', {next: '/question%d'%(user['question'], )})
 
-@blueprint.route('/logout')
+@blueprint.route('/logout', methods=['GET'])
 @api_wrapper
 @require_login
 def logout():
     api.user.logout()
     return WebSucces('Logged out')
 
-@blueprint.route('/register')
+@blueprint.route('/register', methods=['POST'])
 @api_wrapper
-@check_csrf
 def register():
-    uid = api.user.create_user(**api.common.flat_multi(request.form))
+    flat = api.common.flat_multi(request.form)
+    uid = api.user.create_user(flat['username'], flat['password'])
 
     session['uid'] = uid
 
-    return WebSuccess('Registered as {}'%(request.form['username']))
+    return WebSuccess('Registered as %s'%(flat['username'],))
 
-@blueprint.route('/question')
+@blueprint.route('/question', methods=['POST'])
 @api_wrapper
 @check_csrf
 @require_login
@@ -58,3 +58,4 @@ def question():
      answer = flat['answer']
 
      return api.question.check_question(num, answer)
+

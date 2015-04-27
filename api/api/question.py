@@ -1,7 +1,7 @@
 
 import api
 
-from Flask import request, session
+from flask import request, session
 
 from api.common import safe_fail, get_conn, WebSuccess, InternalException
 

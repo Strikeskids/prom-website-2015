@@ -10,6 +10,7 @@ mysql_config = {
 __conn = None
 
 def get_conn():
+    global __conn
     if __conn:
         if __conn.is_connected():
             return __conn
@@ -91,3 +92,33 @@ def flat_multi(multidict):
         flat[key] = values[0] if type(values) == list and len(values) == 1 else values
     return flat
 
+def check(*callback_tuples):
+    """
+    Voluptuous wrapper function to raise our APIException
+    Args:
+        callback_tuples: a callback_tuple should contain (status, msg, callbacks)
+    Returns:
+        Returns a function callback for the Schema
+    """
+
+    def v(value):
+        """
+        Trys to validate the value with the given callbacks.
+        Args:
+            value: the item to validate
+        Raises:
+            APIException with the given error code and msg.
+        Returns:
+            The value if the validation callbacks are satisfied.
+        """
+
+        for msg, callbacks in callback_tuples:
+            for callback in callbacks:
+                try:
+                    result = callback(value)
+                    if not result and type(result) == bool:
+                        raise Invalid()
+                except Exception:
+                    raise WebException(msg)
+        return value
+    return v

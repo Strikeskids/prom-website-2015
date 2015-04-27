@@ -1,17 +1,18 @@
 
 import api
 import bcrypt
+import pymysql
 
 from voluptuous import Schema, Required, Length
-from Flask import request, session
+from flask import request, session
 
-from api.common import safe_fail, get_conn, InternalException, WebException
+from api.common import safe_fail, get_conn, InternalException, WebException, check, validate
 
 login_schema = Schema({
-    Require('username'): check(
+    Required('username'): check(
         ('Usernames must be between 3 and 50 characters', [str, Length(min=3, max=50)]),
     ),
-    Require('password'): check(
+    Required('password'): check(
         ('Passwords must be between 3 and 50 characters', [str, Length(min=3, max=50)]),
     ),
 })
@@ -31,11 +32,11 @@ def get_user_scores(uid=None):
 
     try:
         conn = get_conn()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        query = 'SELECT SUM(`submissions`.`points`) AS `score`, MAX(`questions`.`num`) AS `num`'
+        query = ('SELECT SUM(`submissions`.`points`) AS `score`, MAX(`questions`.`num`) AS `num`'
                 ' FROM `submissions` INNER JOIN `questions` ON `submissions`.`qid` = `questions`.`qid`'
-                ' WHERE `uid` = %s;'
+                ' WHERE `uid` = %s;')
         args = (uid,)
 
         cursor.execute(query, args)
@@ -59,7 +60,7 @@ def login(username, password):
         else:
             raise WebException('Login error')
     else:
-        raise WebException('Username or password incorrect', {button: True})
+        raise WebException('Username or password incorrect', data={'button': True})
 
 def create_user(username, password):
     validate(login_schema, {
@@ -69,9 +70,11 @@ def create_user(username, password):
 
     uid = api.common.token()
 
+    cursor = None
+
     try:
         conn = get_conn()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
         query = 'INSERT INTO `users` (`uid`, `username`, `password_hash`) VALUES (%s, %s, %s);'
 
@@ -79,8 +82,7 @@ def create_user(username, password):
 
         return uid
     finally:
-        if cursor:
-            cursor.close()
+        if cursor: cursor.close()
 
 def get_user(uid=None, name=None):
     query = 'SELECT * FROM `users` WHERE '
@@ -97,7 +99,7 @@ def get_user(uid=None, name=None):
 
     try:
         conn = get_conn()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
         cursor.execute(query, tuple(args))
 

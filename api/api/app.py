@@ -1,6 +1,6 @@
 import api
 
-from flask import Flask
+from flask import Flask, request, session
 from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask(__name__, static_path='/')
@@ -31,7 +31,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type, *')
     response.headers.add('Cache-Control', 'no-cache')
     response.headers.add('Cache-Control', 'no-store')
-    if api.auth.is_logged_in():
+    if api.user.is_logged_in():
         if 'token' in session:
             response.set_cookie('token', session['token'])
         else:
@@ -41,3 +41,4 @@ def after_request(response):
 
     response.mimetype = 'application/json'
     return response
+
