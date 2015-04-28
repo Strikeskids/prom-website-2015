@@ -18,10 +18,11 @@
     }
 
     B.prototype.notify = function(data, redirect, config) {
+        var dataClass = notifyClass(data)
         config = config || {}
-        config.className = notifyClass(data)
+        config.className = config.className || dataClass
         var ret = $.notify(data.message, config)
-        if (redirect && config.className === 'success') {
+        if (redirect && dataClass === 'success') {
             setTimeout(function() {
                 window.location = redirect
             }, 1000)
@@ -67,11 +68,12 @@
     }
 
     jQuery.fn.apiNotify = function(data, redirect, config) {
+        var dataClass = notifyClass(data)
         config = config || {}
-        config.className = notifyClass(data)
+        config.className = config.className || dataClass
         config.position = config.position || 'bottom center'
         var ret = $(this).notify(data.message, config)
-        if (redirect && config.className === 'success') {
+        if (redirect && dataClass === 'success') {
             setTimeout(function() {
                 window.location = redirect
             }, 1000)
@@ -108,7 +110,11 @@ jQuery(function($) {
                 statusChecks.forEach(function(check) {
                     if (check.key === 'question') {
                         if (data.data.num+1 < check.state) {
-                            window.location = check.url
+                            api.notify(
+                                {status:1, message:'You need to solve the previous questions first'},
+                                '/question'+(data.data.num+1),
+                                {className: 'error'}
+                            )
                         }
                     } else if (!!data.data[check.key] === !!check.state) {
                         window.location = check.url
