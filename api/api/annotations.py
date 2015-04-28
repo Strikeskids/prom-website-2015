@@ -24,6 +24,8 @@ def api_wrapper(f):
             else:
                 web_result = WebError(message)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             web_result = WebError('Failed because of %s'%(type(e)))
 		
         return json.dumps(web_result)
