@@ -24,9 +24,8 @@ def status_hook():
 @blueprint.route('/login', methods=['POST'])
 @api_wrapper
 def login():
-    flat = api.common.flat_multi(request.form)
-    api.user.login(flat['username'], flat['password'])
-    print('Logged in')
+    form = api.common.flat_multi(request.form)
+    api.user.login(data=form)
 
     return WebSuccess('Logged in', {'next': api.question.get_next_question_url()})
 
@@ -40,21 +39,18 @@ def logout():
 @blueprint.route('/register', methods=['POST'])
 @api_wrapper
 def register():
-    flat = api.common.flat_multi(request.form)
-    uid = api.user.create_user(flat['username'], flat['password'])
+    form = api.common.form_multi(request.form)
+    uid = api.user.create_user(data=form)
 
     session['uid'] = uid
 
-    return WebSuccess('Registered as %s'%(flat['username'],))
+    return WebSuccess('Registered as %s'%(form['username'],))
 
 @blueprint.route('/question', methods=['POST'])
 @api_wrapper
 @check_csrf
 @require_login
 def question():
-     flat = api.common.flat_multi(request.form)
-     num = flat['question']
-     answer = flat['answer']
 
-     return api.question.check_question(num, answer)
+     return api.question.check_question(data=api.common.flat_multi(request.form))
 

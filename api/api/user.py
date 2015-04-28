@@ -6,7 +6,7 @@ import pymysql
 from voluptuous import Schema, Required, Length
 from flask import request, session
 
-from api.common import safe_fail, get_conn, InternalException, WebException, check, validate
+from api.common import safe_fail, get_conn, InternalException, WebException, check, validate, join_kwargs
 
 login_schema = Schema({
     Required('username'): check(
@@ -42,11 +42,13 @@ def get_user_scores(uid=None):
         scores['score'] = scores['score'] or 0
         return scores
 
-def login(username, password):
-    validate(login_schema, {
-        'username': username,
-        'password': password,    
-    })
+def login(username=None, password=None, data=None):
+    data = join_kwargs(data, username=username, password=password)
+
+    validate(login_schema, data)
+
+    username = data.pop('username')
+    password = data.pop('password')
 
     user = safe_fail(get_user, name=username)
 
@@ -57,13 +59,15 @@ def login(username, password):
         else:
             raise WebException('Login error')
     else:
-        raise WebException('Username or password incorrect', data={'button': True})
+        raise WebException('Username or password incorrect')
 
-def create_user(username, password):
-    validate(login_schema, {
-        'username': username,
-        'password': password,    
-    })
+def create_user(username=None, password=None, data=None):
+    data = join_kwargs(data, username=username, password=password)
+
+    validate(login_schema, data)
+
+    username = data.pop('username')
+    password = data.pop('password')
 
     uid = api.common.token()
 
