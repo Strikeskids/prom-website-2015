@@ -13,21 +13,17 @@ def api_wrapper(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         web_result = {}
-        import traceback
         try:
             web_result = f(*args, **kwargs)
         except WebException as e:
             web_result = WebError(error_message(e), e.data)
-            traceback.print_exc()
         except InternalException as e:
-            traceback.print_exc()
             message = error_message(e)
             if type(e) == SevereInternalException:
                 web_result = WebError('There was a critical internal error. Contact administrator')
             else:
                 web_result = WebError(message)
         except Exception as e:
-            traceback.print_exc()
             web_result = WebError('Failed because of %s'%(type(e)))
 		
         return json.dumps(web_result)
