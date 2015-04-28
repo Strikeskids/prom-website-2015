@@ -4,6 +4,8 @@ import uuid
 
 import pymysql
 
+from voluptuous import MultipleInvalid, Invalid
+
 mysql_config = {
 }
 
@@ -99,6 +101,15 @@ def flat_multi(multidict):
     for key, values in multidict.items():
         flat[key] = values[0] if type(values) == list and len(values) == 1 else values
     return flat
+
+def join_kwargs(data, **kwargs):
+    joined = {}
+    for k, v in kwargs.items():
+        if v:
+            joined[k] = v
+        elif k in data:
+            joined[k] = data[k]
+    return joined
 
 def check(*callback_tuples):
     """
