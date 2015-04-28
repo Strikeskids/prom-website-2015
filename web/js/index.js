@@ -7,13 +7,18 @@ jQuery(function($) {
     formRegister.on('click', function(e) {
         e.preventDefault()
 
+        if (!form[0].checkValidity()) {
+            formSubmit.trigger('click')
+            return
+        }
+
         api.query('POST', '/api/register', formFields.serialize())
             .done(function(json) {
                 formRegister.apiNotify(json, '/question1')
             })
     })
 
-    form.on('submit', function(e) {
+    form.on('submit', function(e, skip) {
         e.preventDefault()
 
         api.query('POST', '/api/login', formFields.serialize())
