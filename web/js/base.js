@@ -69,6 +69,7 @@
     jQuery.fn.apiNotify = function(data, redirect, config) {
         config = config || {}
         config.className = notifyClass(data)
+        config.position = config.position || 'bottom center'
         var ret = $(this).notify(data.message, config)
         if (redirect && config.className === 'success') {
             setTimeout(function() {
