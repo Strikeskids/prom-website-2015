@@ -2,8 +2,20 @@
 import api
 
 from flask import request, session
-from api.common import safe_fail, get_conn, WebSuccess, InternalException
+
+from voluptuous import Schema, Required, Length, Range
+
+from api.common import safe_fail, get_conn, WebSuccess, WebError, InternalException, check, validate, join_kwargs
 from api.annotations import require_login
+
+submission_schema = Schema({
+    Required('question'): check(
+        ('Question number must be positive', [int, Range(min=1)]),
+    ),
+    Required('answer'): check(
+        ('Answer must be between 3 and 50 characters', [str, Length(min=3, max=50)]),
+    ),
+})
 
 def has_solved(qid, uid=None):
     if not uid:
@@ -38,7 +50,13 @@ def get_next_question_url(num=None, uid=None):
     return url
 
 @require_login
-def check_question(num, answer):
+def check_question(question=None, answer=None, data=None):
+    data = join_kwargs(data, question=question, answer=answer)
+    data['question'] = int(data['question'])
+    validate(submission_schema, data)
+    num = data.pop('question')
+    answer = data.pop('answer')
+
     question = safe_fail(get_question, num=num)
 
     if not question:
