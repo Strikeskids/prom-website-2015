@@ -39,7 +39,7 @@ def logout():
 @blueprint.route('/register', methods=['POST'])
 @api_wrapper
 def register():
-    form = api.common.form_multi(request.form)
+    form = api.common.flat_multi(request.form)
     uid = api.user.create_user(data=form)
 
     session['uid'] = uid
