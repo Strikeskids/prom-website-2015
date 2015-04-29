@@ -1,0 +1,22 @@
+---
+title: Question 4
+answers:
+    history: APUSH or Computer Science
+    physics: Physics or French
+    spanish: Spanish or Latin
+    biology: Biology or Chemistry
+    lobby: Trick question. Aud Lob
+question: 4
+answer: physics
+success: 15
+failure: 2
+name: evil-bathroom
+---
+
+<p>Which subject was next to the old boys bathroom with a picture of fish organs on it?</p>
+
+<div class="pseudo-select" data-name="answer">
+{% for answer in page.answers %}
+    <div data-value="{{ answer[0] }}">{{ answer[1] }}</div>
+{% endfor %}
+</div>
