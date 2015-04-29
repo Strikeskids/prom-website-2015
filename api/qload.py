@@ -3,6 +3,7 @@
 import api
 import os
 import yaml
+import itertools
 
 def main():
     import argparse
@@ -15,18 +16,21 @@ def main():
     args = parser.parse_args()
 
     for fname in os.listdir(args.location):
-        print(fname)
+        fname = os.path.join(args.location, fname)
         if os.path.isfile(fname):
             try:
                 with open(fname, 'r') as f:
-                    doc = yaml.load(f)
+                    it = iter(f)
+                    if next(it) != '---\n':
+                        continue
+                    doc = yaml.load(''.join(itertools.takewhile(lambda k: k != '---\n', it)))
                     if 'question' in doc and 'answer' in doc and 'success' in doc and ('name' in doc or 'title' in doc):
-                        print('Inserting', doc)
                         num = doc['question']
                         name = doc['name'] if 'name' in doc else doc['title']
                         answer = doc['answer']
                         success = doc['success']
                         failure = doc['failure'] if 'failure' in doc else 0
+                        print('Inserting', num, name, doc)
                         api.question.add_question(num, name, answer, success, failure)
             except:
                 import traceback
