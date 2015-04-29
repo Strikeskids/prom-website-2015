@@ -82,7 +82,9 @@ def check_question(question=None, answer=None, data=None):
 
 def add_question(num, name, answer, success, failure):
     with get_conn() as cursor:
-        query = 'INSERT INTO `questions` (`qid`, `num`, `name`, `answer`, `success`, `failure`) VALUES (%s, %s, %s, %s, %s, %s);'
+        query = ('INSERT INTO `questions` (`qid`, `num`, `name`, `answer`, `success`, `failure`) VALUES (%s, %s, %s, %s, %s, %s)'
+                ' ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `answer` = VALUES(`answer`),'
+                ' `success` = VALUES(`success`), `failure` = VALUES(`failure`);')
 
         qid = api.common.token()
 

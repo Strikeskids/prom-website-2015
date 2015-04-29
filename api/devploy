@@ -1,5 +1,16 @@
 #!/bin/bash
 
+function contains() {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+            return 0
+        fi
+    }
+    return 1
+}
+
 echo "Shutting down nginx"
 sudo service nginx stop
 
@@ -16,7 +27,13 @@ sudo service nginx start
 echo "Shutting down API"
 tmux kill-session -t promapi 2> /dev/null
 
-if [ -z "$1" ] || [ "$1" != "--local" ]; then
+if contains "$@" "--questions"; then
+    echo "Updating questions"
+    cd /home/api/prom/api
+    python3 qload.py --location /home/api/prom/web/_posts/
+fi
+
+if ! contains "$@" "--local"; then
     echo 'Running API in tmux'
     tmux new-session -s promapi -d "cd /home/api/prom/api ; python3 run.py"
     exit 0
