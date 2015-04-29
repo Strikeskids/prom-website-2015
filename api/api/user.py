@@ -86,7 +86,7 @@ def get_user(uid=None, name=None):
     wheres = []
     if name:
         wheres.append(('`username` = %s', name))
-    if uid or 'uid' in session:
+    if uid or not wheres and 'uid' in session:
         wheres.append(('`uid` = %s', uid or session['uid']))
     if not wheres:
         raise InternalException('Required to specify query')
