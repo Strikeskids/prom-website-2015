@@ -1,0 +1,24 @@
+---
+title: Question 3
+question: 3
+answers:
+    mixer: Mixer
+    knife: Knife
+    pot: Flower Pot
+    squirrel: Squirrel
+    cat: Cat
+answer: squirrel
+success: 10
+failure: 2
+name: whisk
+---
+
+<p><img src="http://resamichellemedia.com/wp-content/uploads/2012/11/whisk1.png" style="width: 100%"></p>
+
+<p>This is a picture of a</p>
+
+<div class="pseudo-select" data-name="answer">
+{% for answer in page.answers %}
+    <div data-value="{{ answer[0] }}">{{ answer[1] }}</div>
+{% endfor %}
+</div>
